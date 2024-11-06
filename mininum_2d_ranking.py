@@ -47,7 +47,7 @@ def mininum_2d_ranking_fast(arr: list[Point]) -> None:
                 a_idx += 1
             p.rank += a_idx
 
-    arr = a + b
+        arr = a + b
 
 def timing(func: Callable, *args) -> float:
     start_time = time()
@@ -75,8 +75,8 @@ def sort_and_compare_arr(arr1: list[Point], arr2: list[Point]) -> bool:
 
 def main():
     n = 20000
-    min_val = -10
-    max_val = 10
+    min_val = -100000
+    max_val = 100000
     arr1 = [Point(x, y) for x, y in zip((randint(min_val, max_val) for _ in range(n)), (randint(min_val, max_val) for _ in range(n)))]
     arr2 = [Point(p.x, p.y) for p in arr1]
 
