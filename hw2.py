@@ -77,13 +77,19 @@ def print_ranking_result(arr: list[Point]):
     for p in arr:
         print(p)
 
+    print()
     arr.sort(key=lambda p: p.rank)
+
+    arr_len = len(arr)
+    print(f"Number of points: {arr_len}")
 
     min_rank_p = arr[0]
     max_rank_p = arr[-1]
-
     print(f"Max rank: {max_rank_p.rank}")
     print(f"Min rank: {min_rank_p.rank}")
+
+    avr = sum([p.rank for p in arr]) / arr_len
+    print("Average rank: %.2f" % (avr, ))
     
 def create_test_data(n: int = 2000, min_val: int = -5000, max_val: int = 5000, filename: str = "test2.txt"):
     if n < 1:
