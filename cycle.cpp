@@ -14,7 +14,7 @@ int main(int argc,char *argv[])
 
 	sscanf(newline,"%i %i",&nodenum,&edgenum);
 
-    int A[nodenum][nodenum];//Àx¦s³s½uªºÂI
+    int A[nodenum][nodenum];//ï¿½xï¿½sï¿½sï¿½uï¿½ï¿½ï¿½I
     for(i=0;i<nodenum;i++)
         for(j=0;j<nodenum;j++)
             A[i][j]=0;
@@ -36,11 +36,11 @@ int main(int argc,char *argv[])
 */
 
 
-    int k,c,pre,no;//²Äno®æ
-    int b=0;//¦³b­Ótemp(¦h¥X¨Óªº±Æ¦C²Õ¦X)
+    int k,c,pre,no;//ï¿½ï¿½noï¿½ï¿½
+    int b=0;//ï¿½ï¿½bï¿½ï¿½temp(ï¿½hï¿½Xï¿½Óªï¿½ï¿½Æ¦Cï¿½Õ¦X)
     int s=0,e=nodenum,cycle=0;
     int temp[nodenum];
-    int order[20000][nodenum];//¹w³]­È-1
+    int order[20000][nodenum];//ï¿½wï¿½]ï¿½ï¿½-1
     int check_re[20000];
     int check_cycle[nodenum];
     for(i=0;i<20000;i++)
@@ -49,26 +49,26 @@ int main(int argc,char *argv[])
     for(i=0;i<nodenum;i++)
         order[i][0]=i;
     int adde;
-    int t;//¤ñ¤j¤p®Éªºtemp
+    int t;//ï¿½ï¿½jï¿½pï¿½Éªï¿½temp
     int smallest,compare;
     int m,n;
 
-    for(no=1;no<nodenum;no++)//³]©wno
+    for(no=1;no<nodenum;no++)//ï¿½]ï¿½wno
     {
 
 
         adde=0;
         s=0;
-        for(k=0;k<e;k++)//°µe¦¸¥[ªø³s½u(e¹w³]¬°nodenum)
+        for(k=0;k<e;k++)//ï¿½ï¿½eï¿½ï¿½ï¿½[ï¿½ï¿½ï¿½sï¿½u(eï¿½wï¿½]ï¿½ï¿½nodenum)
         {
            s=s+b;
            b=0;
-           pre=order[s][no-1];//pre¬O«e¤@­Ó³»ÂI
-           for((i=order[s][0]+1);i<nodenum;i++)//i=pre+1­×§ï­×§ï­×§ï­×§ï­×§ï­×§ï­×§ï­×§ï­×§ï­×§ï­×§ï
+           pre=order[s][no-1];//preï¿½Oï¿½eï¿½@ï¿½Ó³ï¿½ï¿½I
+           for((i=order[s][0]+1);i<nodenum;i++)//i=pre+1ï¿½×§ï¿½×§ï¿½×§ï¿½×§ï¿½×§ï¿½×§ï¿½×§ï¿½×§ï¿½×§ï¿½×§ï¿½×§ï¿½
            {
               if(A[pre][i]==1)
               {
-                for(j=1;j<(no-1);j++)//for°j°é ÀË¬d¦³¨S¦³­«½Æªº³»ÂI
+                for(j=1;j<(no-1);j++)//forï¿½jï¿½ï¿½ ï¿½Ë¬dï¿½ï¿½ï¿½Sï¿½ï¿½ï¿½ï¿½ï¿½Æªï¿½ï¿½ï¿½ï¿½I
                 {
                     if(order[s][j]==i)
                     {
@@ -77,7 +77,7 @@ int main(int argc,char *argv[])
                     }
                 }
                 if(j!=-1)
-                    temp[b++]=i;//b­pºâ¦h¥X¨Óªº±Æ¦C²Õ¦X
+                    temp[b++]=i;//bï¿½pï¿½ï¿½hï¿½Xï¿½Óªï¿½ï¿½Æ¦Cï¿½Õ¦X
               }
            }
            c=0;
@@ -85,25 +85,25 @@ int main(int argc,char *argv[])
            if(b>0)
            {
                adde=adde+b-1;
-               for(i=e+adde;i>s;i--)//©¹«á²¾ (§ó§ï:e->e+adde)
+               for(i=e+adde;i>s;i--)//ï¿½ï¿½ï¿½á²¾ (ï¿½ï¿½ï¿½:e->e+adde)
                {
                   for(j=0;j<no;j++)
                       order[i+b-1][j]=order[i][j];
                }
-               for(i=s;i<(s+b);i++)//¸É¤W&·s³s½u
+               for(i=s;i<(s+b);i++)//ï¿½É¤W&ï¿½sï¿½sï¿½u
                {
                    order[i][no]=temp[c++];
                    for(j=0;j<no;j++)
                        order[i][j]=order[s][j];
 
-                   //ÀË¬dcycle
+                   //ï¿½Ë¬dcycle
                    if(no>1&&A[order[i][no]][order[i][0]]==1)
                    {
 
                        for(m=0;m<=no;m++)
                            check_cycle[m]=order[i][m];
 
-                       compare=0;//ÀË¬d¬O§_¬°¤Ï§Ç
+                       compare=0;//ï¿½Ë¬dï¿½Oï¿½_ï¿½ï¿½ï¿½Ï§ï¿½
 
                        for(m=1;m<=no;m++)
                            compare=compare*10+check_cycle[m];
@@ -145,7 +145,7 @@ fclose(fp);*/
            }
            else//b==0
            {
-               for(i=s;i<e+adde;i++)//©¹«e²¾1®æ
+               for(i=s;i<e+adde;i++)//ï¿½ï¿½ï¿½eï¿½ï¿½1ï¿½ï¿½
                {
                   for(j=0;j<=no;j++)
                       order[i][j]=order[i+1][j];
