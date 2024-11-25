@@ -1,6 +1,69 @@
-#include<stdio.h>
-#include<stdlib.h>
-#include<vector>
+#include <stdio.h>
+#include <stdlib.h>
+#include <vector>
+#include <iostream>
+#include <algorithm>
+#include <unordered_map>
+
+void comb(int n, std::vector<int>& picked, int toPick, std::vector<std::vector<int>>& result) {
+    if (toPick == 0) {
+        std::vector<int> tmp(picked.size());
+        for (int i = 0; i < picked.size(); ++i) {
+            tmp[i] = picked[i];
+        }
+        result.push_back(tmp);
+    }
+    int smallest = picked.empty() ? 0 : picked.back() + 1;
+    for (int next = smallest; next < n; ++next) {
+        picked.push_back(next);
+        comb(n, picked, toPick - 1, result);
+        picked.pop_back();
+    }
+}
+
+void print_result(std::vector<std::vector<int>>& result) {
+    for (int i = 0; i < result.size(); ++i) {
+        for (int j = 0; j < result[i].size(); ++j) {
+            if (j > 0)
+                std::cout << " ";
+            std::cout << result[i][j];
+        }
+        std::cout << std:: endl;
+    }
+}
+
+bool comp_vec_size(std::vector<std::pair<int, int>>& vec1, std::vector<std::pair<int, int>>& vec2) {
+    return vec1.size() < vec2.size();
+}
+
+std::vector<bool> encode_edge(std::vector<std::vector<int>>& board, std::pair<int, int>& p, int n) {
+    std::vector<bool> encoded = std::vector<bool>(n, false);
+    if (board[p.first][p.second] >= 0 || board[p.second][p.first] >= 0)
+        encoded[board[p.first][p.second]] = true;
+    return encoded;
+}
+
+std::vector<bool> encode_cycle(std::vector<std::vector<int>>& board, std::vector<std::pair<int, int>>& cycle, int n) {
+    std::vector<bool> final_encoded = std::vector<bool>(n, false);
+    for (int i = 0; i < cycle.size(); ++i) {
+        std::vector<bool> encoded = encode_edge(board, cycle[i], n);
+        for (int j = 0; j < n; ++j)
+            final_encoded[j] = final_encoded[j] | encoded[j];
+    }
+    return final_encoded;
+}
+
+bool encoded_vec_equal(std::vector<bool>& vec1, std::vector<bool>& vec2) {
+    int vec1_size = vec1.size();
+    int vec2_size = vec2.size();
+    if (vec1_size != vec2_size)
+        return false;
+    for (int i = 0; i < vec1_size; ++i) {
+        if (vec1[i] != vec2[i])
+            return false;
+    }
+    return true;
+}
 
 int main(int argc,char *argv[])
 {
@@ -53,6 +116,8 @@ int main(int argc,char *argv[])
     int t;//��j�p�ɪ�temp
     int smallest,compare;
     int m,n;
+
+    std::vector<std::vector<int>> cycles;
 
     for(no=1;no<nodenum;no++)//�]�wno
     {
@@ -133,11 +198,11 @@ fclose(fp);*/
 
 
 
-
+                            std::vector<int> vec;
                             for(j=0;j<=no;j++)
-                                printf("%d->",order[i][j]);
-                            printf("%d",order[i][0]);
-                            printf("\n");
+                                vec.push_back(order[i][j]);
+                            vec.push_back(order[i][0]);
+                            cycles.push_back(vec);
                             cycle++;
                        }
 
@@ -155,8 +220,146 @@ fclose(fp);*/
            }
         }
         e=e+adde;
-
     }
-    printf("%d cycles",cycle);
-    getchar();
+
+    /*
+    for (i = 0; i < cycles.size(); ++i) {
+        for (j = 0; j < cycles[i].size(); ++j) {
+            std::cout << cycles[i][j] << "->";
+        }
+        std::cout << cycles[i][0] << std::endl;
+    }
+    std::cout << cycles.size() << " cycles" << std::endl;
+    */
+
+    std::vector<std::vector<std::pair<int, int>>> edges;
+    for (i = 0; i < cycles.size(); ++i) {
+        std::vector<std::pair<int, int>> edges_tmp;
+        for (j = 0; j < cycles[i].size() - 1; ++j) {
+            std::pair<int, int> p;
+            p.first = cycles[i][j];
+            p.second = cycles[i][j + 1];
+            edges_tmp.push_back(p);
+        }
+        edges.push_back(edges_tmp);
+    }
+
+    /*
+    for (i = 0; i < edges.size(); ++i) {
+        std::cout << "Cycle " << i + 1 << ":" << std::endl;
+        for (j = 0; j < edges[i].size(); ++j) {
+            std::cout << "(" << edges[i][j].first << ", " << edges[i][j].second << ")" << std::endl;
+        }
+    }
+    */
+
+    int encodes = 0;
+    std::vector<std::vector<int>> edge_id_board(nodenum, std::vector<int>(nodenum, -1));
+    for (i = 0; i < edges.size(); ++i) {
+        for (j = 0; j < edges[i].size(); ++j) {
+            if (edge_id_board[edges[i][j].first][edges[i][j].second] < 0 || edge_id_board[edges[i][j].second][edges[i][j].first] < 0) {
+                edge_id_board[edges[i][j].first][edges[i][j].second] = encodes;
+                edge_id_board[edges[i][j].second][edges[i][j].first] = encodes;
+                ++encodes;
+            }
+        }
+    }
+
+    /*
+    for (i = 0; i < edge_id_board.size(); ++i) {
+        for (j = 0; j < edge_id_board[i].size(); ++j) {
+            if (j != 0)
+                std::cout << "\t";
+            std::cout << edge_id_board[i][j];
+        }
+        std::cout << std::endl;
+    }
+    std::cout << encodes << std::endl;
+    */
+
+    std::sort(edges.begin(), edges.end(), comp_vec_size);
+
+    /*
+    for (i = 0; i < edges.size(); ++i) {
+        std::cout << "Cycle " << i + 1 << ":" << std::endl;
+        for (j = 0; j < edges[i].size(); ++j) {
+            std::cout << "(" << edges[i][j].first << ", " << edges[i][j].second << ")" << std::endl;
+        }
+    }
+    */
+
+    std::vector<std::vector<bool>> encoded_cycles(edges.size());
+    for (i = 0; i < edges.size(); ++i) {
+        std::vector<bool> encoded_cycle = encode_cycle(edge_id_board, edges[i], encodes);
+        encoded_cycles.push_back(encoded_cycle);
+    }
+
+    for (i = 0; i < encoded_cycles.size(); ++i) {
+        for (j = 0; j < encoded_cycles[i].size(); ++j) {
+            std::cout << encoded_cycles[i][j];
+        }
+        std::cout << std::endl;
+    }
+
+    int required = encodes - nodenum + 1;
+    int current_selected = 0;
+    std::vector<int> cycle_indexes(required);
+    std::vector<std::vector<bool>> selected_encoded_cycles(required, std::vector<bool>(encodes));
+    std::vector<int> picked;
+    std::vector<std::vector<int>> result;
+
+    for (i = 0; i < encoded_cycles.size(); ++i) {
+        std::cout << selected_encoded_cycles.size() << std::endl;
+        if (current_selected < 2) {
+            for (j = 0; j < encodes; ++j) {
+                std::cout << "Test" << std::endl;
+                selected_encoded_cycles[current_selected][j] = encoded_cycles[i][j];
+            }
+            ++current_selected;
+            if (current_selected >= required)
+                break;
+        }
+        else {
+            bool all_same;
+            for (j = 2; j <= current_selected; ++i) {
+                all_same = true;
+                result.clear();
+                picked.clear();
+                comb(current_selected, picked, j, result);
+                print_result(result);
+                
+                for (int x = 0; x < result.size(); ++x) {
+                    std::vector<bool> c_cycle(encodes);
+                    std::cout << "Test" << std::endl;
+                    for (int z = 0; z < encodes; ++z) {
+                        c_cycle[z] = selected_encoded_cycles[result[x][0]][z];
+                    }
+                    for (int z = 0; z < encodes; ++z)
+                        std::cout << c_cycle[z];
+                    std::cout << std::endl;
+                    for (int y = 1; y < result[x].size(); ++y) {
+                        for (int z = 0; z < encodes; ++z) {
+                            c_cycle[z] = c_cycle[z] ^ selected_encoded_cycles[result[x][y]][z];
+                        }
+                    }
+                    for (int z = 0; z < encodes; ++z) {
+                        if (encoded_cycles[i][z] != c_cycle[z]) {
+                            all_same = false;
+                            break;
+                        }
+                    }
+                    if (all_same == true)
+                        break;
+                }
+                if (all_same == true)
+                    break;
+            }
+            if (all_same == false) {
+                selected_encoded_cycles[current_selected] = encoded_cycles[i];
+                ++current_selected;
+                if (current_selected >= required)
+                    break;
+            }
+        }
+    }
 }
