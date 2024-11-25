@@ -277,8 +277,6 @@ fclose(fp);*/
     std::cout << encodes << std::endl;
     */
 
-    std::sort(edges.begin(), edges.end(), comp_vec_size);
-
     /*
     for (i = 0; i < edges.size(); ++i) {
         std::cout << "Cycle " << i + 1 << ":" << std::endl;
@@ -288,18 +286,22 @@ fclose(fp);*/
     }
     */
 
-    std::vector<std::vector<bool>> encoded_cycles(edges.size());
+    std::vector<std::vector<bool>> encoded_cycles(edges.size(), std::vector<bool>(encodes));
     for (i = 0; i < edges.size(); ++i) {
         std::vector<bool> encoded_cycle = encode_cycle(edge_id_board, edges[i], encodes);
-        encoded_cycles.push_back(encoded_cycle);
+        for (j = 0; j < encodes; ++j) {
+            encoded_cycles[i][j] = encoded_cycle[j];
+        }
     }
 
+    /*
     for (i = 0; i < encoded_cycles.size(); ++i) {
         for (j = 0; j < encoded_cycles[i].size(); ++j) {
-            std::cout << encoded_cycles[i][j];
+            std::cout << encoded_cycles[0][j];
         }
         std::cout << std::endl;
     }
+    */
 
     int required = encodes - nodenum + 1;
     int current_selected = 0;
@@ -309,34 +311,28 @@ fclose(fp);*/
     std::vector<std::vector<int>> result;
 
     for (i = 0; i < encoded_cycles.size(); ++i) {
-        std::cout << selected_encoded_cycles.size() << std::endl;
         if (current_selected < 2) {
-            for (j = 0; j < encodes; ++j) {
-                std::cout << "Test" << std::endl;
+            for (j = 0; j < encoded_cycles[i].size(); ++j) {
                 selected_encoded_cycles[current_selected][j] = encoded_cycles[i][j];
             }
+            cycle_indexes[current_selected] = i;
             ++current_selected;
             if (current_selected >= required)
                 break;
         }
         else {
             bool all_same;
-            for (j = 2; j <= current_selected; ++i) {
+            for (j = 2; j <= current_selected; ++j) {
                 all_same = true;
                 result.clear();
                 picked.clear();
                 comb(current_selected, picked, j, result);
-                print_result(result);
                 
                 for (int x = 0; x < result.size(); ++x) {
                     std::vector<bool> c_cycle(encodes);
-                    std::cout << "Test" << std::endl;
                     for (int z = 0; z < encodes; ++z) {
                         c_cycle[z] = selected_encoded_cycles[result[x][0]][z];
                     }
-                    for (int z = 0; z < encodes; ++z)
-                        std::cout << c_cycle[z];
-                    std::cout << std::endl;
                     for (int y = 1; y < result[x].size(); ++y) {
                         for (int z = 0; z < encodes; ++z) {
                             c_cycle[z] = c_cycle[z] ^ selected_encoded_cycles[result[x][y]][z];
@@ -355,11 +351,36 @@ fclose(fp);*/
                     break;
             }
             if (all_same == false) {
-                selected_encoded_cycles[current_selected] = encoded_cycles[i];
+                for (int z = 0; z < encodes; ++z) {
+                    selected_encoded_cycles[current_selected][z] = encoded_cycles[i][z];
+                }
+                cycle_indexes[current_selected] = i;
                 ++current_selected;
                 if (current_selected >= required)
                     break;
             }
+        }
+    }
+    
+    /*
+    for (i = 0; i < 16; ++i) {
+        for (j = 0; j < encodes; ++j) {
+            std::cout << selected_encoded_cycles[i][j];
+        }
+        std::cout << std::endl;
+    }
+    */
+
+    /*
+    for (i = 0; i < current_selected; ++i) {
+        std::cout << cycle_indexes[i] << std::endl;
+    }
+    */
+
+    for (i = 0; i < current_selected; ++i) {
+        std::cout << std::endl;
+        for (j = 0; j < edges[cycle_indexes[i]].size(); ++j) {
+            std::cout << "(" << edges[cycle_indexes[i]][j].first << ", " << edges[cycle_indexes[i]][j].second << ")" << std::endl;
         }
     }
 }
