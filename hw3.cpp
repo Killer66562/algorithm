@@ -308,7 +308,7 @@ fclose(fp);*/
     std::vector<int> cycle_indexes(required);
     std::vector<std::vector<bool>> selected_encoded_cycles(required, std::vector<bool>(encodes));
     std::vector<int> picked;
-    std::vector<std::vector<int>> result;
+    std::vector<std::vector<int>> result; //Cn取k的結果
 
     for (i = 0; i < encoded_cycles.size(); ++i) {
         if (current_selected < 2) {
@@ -321,44 +321,52 @@ fclose(fp);*/
                 break;
         }
         else {
-            bool all_same;
+            //Cn取k的k => j
+            bool all_zero = true;
             for (j = 2; j <= current_selected; ++j) {
-                all_same = true;
                 result.clear();
                 picked.clear();
                 comb(current_selected, picked, j, result);
-                
+
                 for (int x = 0; x < result.size(); ++x) {
+                    //Init a tmp 01 encoded cycle for checking all 0
                     std::vector<bool> c_cycle(encodes);
                     for (int z = 0; z < encodes; ++z) {
                         c_cycle[z] = selected_encoded_cycles[result[x][0]][z];
                     }
-                    for (int y = 1; y < result[x].size(); ++y) {
+                    //
+                    for (int y = 1; y < j; ++y) {
                         for (int z = 0; z < encodes; ++z) {
                             c_cycle[z] = c_cycle[z] ^ selected_encoded_cycles[result[x][y]][z];
                         }
                     }
+                    //
                     for (int z = 0; z < encodes; ++z) {
-                        if (encoded_cycles[i][z] != c_cycle[z]) {
-                            all_same = false;
+                        c_cycle[z] = c_cycle[z] ^ encoded_cycles[i][z];
+                    }
+                    //Check
+                    all_zero = true;
+                    for (int z = 0; z < encodes; ++z) {
+                        if (c_cycle[z]) {
+                            all_zero = false;
                             break;
                         }
                     }
-                    if (all_same == true)
+                    if (all_zero)
                         break;
                 }
-                if (all_same == true)
+                if (all_zero)
                     break;
             }
-            if (all_same == false) {
-                for (int z = 0; z < encodes; ++z) {
-                    selected_encoded_cycles[current_selected][z] = encoded_cycles[i][z];
-                }
-                cycle_indexes[current_selected] = i;
-                ++current_selected;
-                if (current_selected >= required)
-                    break;
+            if (all_zero)
+                continue;
+            for (int z = 0; z < encodes; ++z) {
+                selected_encoded_cycles[current_selected][z] = encoded_cycles[i][z];
             }
+            cycle_indexes[current_selected] = i;
+            ++current_selected;
+            if (current_selected >= required)
+                break;
         }
     }
     
@@ -378,9 +386,10 @@ fclose(fp);*/
     */
 
     for (i = 0; i < current_selected; ++i) {
-        std::cout << std::endl;
+        std::cout << "Weight: " << edges[cycle_indexes[i]].size() << " => ";
         for (j = 0; j < edges[cycle_indexes[i]].size(); ++j) {
-            std::cout << "(" << edges[cycle_indexes[i]][j].first << ", " << edges[cycle_indexes[i]][j].second << ")" << std::endl;
+            std::cout << edges[cycle_indexes[i]][j].first << "->";
         }
+        std::cout << edges[cycle_indexes[i]][0].first << std::endl;
     }
 }
