@@ -1,7 +1,7 @@
 from random import randint
 from math import inf
 from time import time
-from typing import Callable
+from typing import Any, Callable, T
 
 
 def find_k_smallest(arr: list[float], k: int):
@@ -48,7 +48,8 @@ def find_k_smallest_sorted(arr: list[float], k: int):
     new_arr = sorted(arr, key=lambda x: x)
     return new_arr[k]
 
-def timing(func: Callable, *args) -> float:
+
+def timing(func: Callable[...], *args) -> tuple[float, Any]:
     start_time = time()
     result = func(*args)
     end_time = time()
