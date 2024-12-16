@@ -122,54 +122,21 @@ def mc(items_count: int, items: list[Item], selected: list[bool], m: int, idx: i
     else:
         mc(items_count, items, idx_not_selected, m, idx + 1, idx_not_selected_bb, ref_bb, counter)
         mc(items_count, items, idx_selected, m, idx + 1, idx_selected_bb, ref_bb, counter)
-    
 
-def mountain_climbing(items_count: int, items: list[Item], selected: list[bool], m: int, idx: int, current_bb: BoundBlock, ref_bb: BoundBlock, counter: Counter):
-    if idx >= items_count:
-        if current_bb.valid:
-            ref_bb.lb = max(ref_bb.lb, current_bb.lb)
-        return None
-    
-    idx_selected = [_ for _ in selected]
-    idx_not_selected = [_ for _ in selected]
+def dp(items_count: int, items: list[Item], m: int) -> int:
+    v = [item.price for item in items]
+    w = [item.weight for item in items]
+    s = [[0 for _ in range(m + 1)] for _ in range(items_count + 1)]
+    for i in range(items_count + 1):
+        for j in range(m + 1):
+            if i == 0 or j == 0:
+                s[i][j] = 0
+            elif w[i - 1] <= j:
+                s[i][j] = max(v[i - 1] + s[i - 1][j - w[i - 1]], s[i - 1][j])
+            else:
+                s[i][j] = s[i - 1][j]
 
-    idx_selected[idx] = True
-    idx_not_selected[idx] = False
-
-    idx_selected_bb = calculate_bounds(items_count, items, idx_selected, m)
-    idx_not_selected_bb = calculate_bounds(items_count, items, idx_not_selected, m)
-
-    print_pattern_bb(idx_selected, idx_selected_bb)
-    print_pattern_bb(idx_not_selected, idx_not_selected_bb)
-
-    #兩種情況背包都裝不下
-    if not idx_selected_bb.valid and not idx_not_selected_bb.valid:
-        return None
-    elif idx_selected_bb.valid and not idx_not_selected_bb.valid:
-        if idx_selected_bb.lb > ref_bb.ub:
-            return None
-        ref_bb.ub = min(ref_bb.ub, idx_selected_bb.ub)
-        mountain_climbing(items_count, items, idx_selected, m, idx + 1, idx_selected_bb, ref_bb, counter)
-    elif not idx_selected_bb.valid and idx_not_selected_bb.valid:
-        if idx_not_selected_bb.lb > ref_bb.ub:
-            return None
-        ref_bb.ub = min(ref_bb.ub, idx_not_selected_bb.ub)
-        mountain_climbing(items_count, items, idx_not_selected, m, idx + 1, idx_not_selected_bb, ref_bb, counter)
-    else:
-        if idx_selected_bb.lb < idx_not_selected_bb.lb:
-            if not idx_selected_bb.lb > ref_bb.ub:
-                ref_bb.ub = min(ref_bb.ub, idx_selected_bb.ub)
-                mountain_climbing(items_count, items, idx_selected, m, idx + 1, idx_selected_bb, ref_bb, counter)
-            if not idx_not_selected_bb.lb > ref_bb.ub:
-                ref_bb.ub = min(ref_bb.ub, idx_not_selected_bb.ub)
-                mountain_climbing(items_count, items, idx_not_selected, m, idx + 1, idx_not_selected_bb, ref_bb, counter)
-        else:
-            if not idx_not_selected_bb.lb > ref_bb.ub:
-                ref_bb.ub = min(ref_bb.ub, idx_not_selected_bb.ub)
-                mountain_climbing(items_count, items, idx_not_selected, m, idx + 1, idx_not_selected_bb, ref_bb, counter)
-            if not idx_selected_bb.lb > ref_bb.ub:
-                ref_bb.ub = min(ref_bb.ub, idx_selected_bb.ub)
-                mountain_climbing(items_count, items, idx_selected, m, idx + 1, idx_selected_bb, ref_bb, counter)
+    return s[items_count][m]
 
 def main(create_file: bool = False):
     if create_file is True:
@@ -177,7 +144,7 @@ def main(create_file: bool = False):
         return None
 
     items: list[Item] = []
-    with open("hw4_input_1.txt", mode="r", encoding="utf8") as file:
+    with open("hw4_input_3.txt", mode="r", encoding="utf8") as file:
         m = int(file.readline())
         n = int(file.readline())
         for _ in range(n):
@@ -202,6 +169,11 @@ def main(create_file: bool = False):
 
     print("Final result:")
     print(ref_bb)
+
+    print("====================")
+ 
+    dp_result = dp(n, items, m)
+    print(f"DP result: {dp_result}")
 
 if __name__ == "__main__":
     main(create_file=False)
