@@ -1,4 +1,5 @@
 from random import randint
+from pathlib import Path
 
 
 class Counter(object):
@@ -29,7 +30,9 @@ class Item(object):
         return f"Price: {self.price} Weight: {self.weight}"
 
 
-def create_input_file(files_count: int = 3):
+def create_input_files(files_count: int = 3) -> list[str]:
+    file_paths = []
+
     for i in range(1, files_count + 1):
         lines = []
         m = randint(40, 80)
@@ -39,8 +42,14 @@ def create_input_file(files_count: int = 3):
         for _ in range(n):
             p, w = randint(2, 10), randint(4, 20)
             lines.append(f"{p} {w}\r\n")
-        with open(f"hw4_input_{i}.txt", mode="w", encoding="utf8") as file:
+        
+        fp = f"hw4_input_{i}.txt"
+        file_paths.append(fp)
+
+        with open(fp, mode="w", encoding="utf8") as file:
             file.writelines(lines)
+
+    return file_paths
 
 def print_pattern_bb(selected: list[bool | None], bb: BoundBlock):
     pattern_selected = "".join(["1" if x is True else "0" if x is False else "X" for x in selected])
@@ -138,13 +147,9 @@ def dp(items_count: int, items: list[Item], m: int) -> int:
 
     return s[items_count][m]
 
-def main(create_file: bool = False):
-    if create_file is True:
-        create_input_file()
-        return None
-
+def read_and_solve(file_path: str | Path, encoding: str = "utf-8"):
     items: list[Item] = []
-    with open("hw4_input_3.txt", mode="r", encoding="utf8") as file:
+    with open(file_path, mode="r", encoding=encoding) as file:
         m = int(file.readline())
         n = int(file.readline())
         for _ in range(n):
@@ -174,6 +179,56 @@ def main(create_file: bool = False):
  
     dp_result = dp(n, items, m)
     print(f"DP result: {dp_result}")
+    print("")
+
+def main():
+    while True:
+        print("Please enter what you want to do:")
+        print("1. Read file")
+        print("2. Create input files")
+        print("")
+        print("You can also enter 'exit' to exit")
+        
+        mode = input()
+        mode = mode.strip()
+
+        if mode == 'exit':
+            break
+        elif mode == "1":
+            while True:
+                print("Please enter the file path:")
+                file_path = input()
+
+                try:
+                    real_file_path = Path(file_path)
+                    read_and_solve(real_file_path)
+                    break
+                except Exception:
+                    print("Invalid file path")
+        elif mode == "2":
+            while True:
+                print("How many input files do you wand to create?")
+                num_str = input()
+
+                try:
+                    num = int(num_str)
+
+                    if num < 1:
+                        print("Number >= 1 required")
+                        continue
+                    file_paths = create_input_files(files_count=num)
+
+                    print("Created files:")
+                    for fp in file_paths:
+                        print(fp)
+                    print("")
+                    break
+                except ValueError:
+                    print("You cannot enter a non-integer")
+                except Exception:
+                    print("Unknown error")
+        else:
+            print("Only 1, 2 or 'exit' are allowed")
 
 if __name__ == "__main__":
-    main(create_file=False)
+    main()
