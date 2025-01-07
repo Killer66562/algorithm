@@ -182,22 +182,27 @@ def read_and_solve(file_path: str | Path, encoding: str = "utf-8"):
     print("")
 
 def main():
+    exited = False
     while True:
         print("Please enter what you want to do:")
         print("1. Read file")
         print("2. Create input files")
         print("")
-        print("You can also enter 'exit' to exit")
+        print("You can always enter 'exit' to exit")
         
         mode = input()
         mode = mode.strip()
 
         if mode == 'exit':
-            break
+            exited = True
         elif mode == "1":
             while True:
                 print("Please enter the file path:")
                 file_path = input()
+
+                if file_path == "exit":
+                    exited = True
+                    break
 
                 try:
                     real_file_path = Path(file_path)
@@ -209,6 +214,10 @@ def main():
             while True:
                 print("How many input files do you wand to create?")
                 num_str = input()
+
+                if num_str == "exit":
+                    exited = True
+                    break
 
                 try:
                     num = int(num_str)
@@ -229,6 +238,9 @@ def main():
                     print("Unknown error")
         else:
             print("Only 1, 2 or 'exit' are allowed")
+
+        if exited:
+            break
 
 if __name__ == "__main__":
     main()
