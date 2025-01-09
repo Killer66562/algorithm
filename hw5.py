@@ -10,12 +10,17 @@ class LCS(object):
 
         for i in range(str1_len):
             for j in range(str2_len):
+                left_int = int(result[i + 1][j]) if result[i + 1][j] != "" else 0
+                right_int = int(result[i][j + 1]) if result[i][j + 1] != "" else 0
                 if str1[i] == str2[j]: # 字元相等
-                    result[i + 1][j + 1] = result[i][j] + str1[i]
+                    next_result = result[i][j] + str1[i]
+                    if int(next_result) > left_int and int(next_result) > right_int:
+                        result[i + 1][j + 1] = next_result
+                    elif left_int > right_int: # 從左邊來
+                        result[i + 1][j + 1] = result[i + 1][j]
+                    else: # 從上面來
+                        result[i + 1][j + 1] = result[i][j + 1]
                 else:
-                    left_int = int(result[i + 1][j]) if result[i + 1][j] != "" else 0
-                    right_int = int(result[i][j + 1]) if result[i][j + 1] != "" else 0
-
                     if left_int > right_int: # 從左邊來
                         result[i + 1][j + 1] = result[i + 1][j]
                     else: # 從上面來
